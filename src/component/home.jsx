@@ -41,12 +41,29 @@ const Home = () => {
       //진행중이 아니라면
       setInProgress({ id: itemId, status: true })
       setTimerBtn(false)
+      const now = new Date()
+      const timeString = now.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' })
+      setTimer(timeString)
+      setStartTime(now)
     }
     if (inProgress.status) {
       if (inProgress.id === itemId) {
         // 진행중 + 동일한 아이디
         setTimerBtn(true)
         setInProgress({ id: null, status: false })
+        const end = new Date()
+        const difference = end - startTime
+        const totalMinutesCalculate = Math.floor(difference / 1000 / 60)
+        const updatedList = list.map((item) => {
+          if (item.id === itemId) {
+            return { ...item, totalTime: item.totalTime + totalMinutesCalculate }
+          }
+          return item
+        })
+
+        // 수정된 리스트를 로컬 스토리지에 저장
+        localStorage.setItem('List', JSON.stringify(updatedList))
+        SetList(updatedList)
       } else {
         return
       }
@@ -67,8 +84,8 @@ const Home = () => {
           <StartBtn onClick={() => timerBtnHandler(item.id)} disabled={!inProgress.status && inProgress.id === item.id}>
             {inProgress.id === item.id ? '중지' : '시작'}
           </StartBtn>
-          <Timer>{timer}</Timer>
-          <TotalTime>총 {item.totalTime}</TotalTime>
+          <Timer>{inProgress.id === item.id ? timer : ''}</Timer>
+          <TotalTime>총 {item.totalTime}분</TotalTime>
         </ListBox>
       ))}
     </Section>
@@ -101,10 +118,12 @@ const ListAddButton = styled.button`
 `
 
 const ListBox = styled.div`
+  width: 550px;
   display: flex;
   flex-direction: row;
   margin-bottom: 10px;
   align-items: center;
+  border-bottom: 1px solid gray;
 `
 const DeleteButton = styled.button`
   cursor: pointer;
@@ -113,7 +132,6 @@ const DeleteButton = styled.button`
   top: 0;
 `
 const ListTitle = styled.p`
-  background-color: pink;
   width: 300px;
   height: 40px;
   display: flex;
