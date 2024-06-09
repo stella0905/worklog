@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { styled } from 'styled-components'
 import { v4 as uuidv4 } from 'uuid'
 
-const Home = () => {
+const Main = () => {
   const [addList, setAddList] = useState('')
   const [list, SetList] = useState([])
   const [timerBtn, setTimerBtn] = useState(true)
@@ -92,7 +92,7 @@ const Home = () => {
   )
 }
 
-export default Home
+export default Main
 
 const Section = styled.section`
   margin: 20px;
