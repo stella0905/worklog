@@ -11,6 +11,7 @@ const Main = () => {
   const [startTime, setStartTime] = useState()
   const [endTime, setEndTime] = useState()
   const [inProgress, setInProgress] = useState({ id: null, status: false })
+  const [count, setCount] = useState(0)
 
   useEffect(() => {
     const savedList = JSON.parse(localStorage.getItem('List')) || []
@@ -21,8 +22,11 @@ const Main = () => {
   const onChangeList = (e) => {
     setAddList(e.target.value)
   }
+  const onChangeCount = (e) => {
+    setCount(e.target.value)
+  }
   const ListAddBtnHandler = () => {
-    const newItem = { id: uuidv4(), content: addList, totalTime: 0 }
+    const newItem = { id: uuidv4(), content: addList, totalTime: 0, totalCount: 0 }
     const newList = [...list, newItem]
     SetList(newList)
     localStorage.setItem('List', JSON.stringify(newList))
@@ -53,7 +57,7 @@ const Main = () => {
         setInProgress({ id: null, status: false })
         const end = new Date()
         const difference = end - startTime
-        const totalMinutesCalculate = Math.floor(difference / 1000 / 60)
+        const totalMinutesCalculate = Math.ceil(difference / 1000 / 60)
         const updatedList = list.map((item) => {
           if (item.id === itemId) {
             return { ...item, totalTime: item.totalTime + totalMinutesCalculate }
@@ -68,6 +72,23 @@ const Main = () => {
         return
       }
     }
+  }
+  const countHandler = (itemId) => {
+    if (inProgress.status) {
+      return
+    }
+    const userInput = prompt('건수를 입력하세요:', '')
+    setCount(userInput)
+    const updatedCount = list.map((item) => {
+      if (item.id === itemId) {
+        return { ...item, totalCount: userInput }
+      }
+      return item
+    })
+    window.location.reload()
+
+    // 수정된 리스트를 로컬 스토리지에 저장
+    localStorage.setItem('List', JSON.stringify(updatedCount))
   }
   return (
     <Section>
@@ -86,6 +107,11 @@ const Main = () => {
           </StartBtn>
           <Timer>{inProgress.id === item.id ? timer : ''}</Timer>
           <TotalTime>총 {item.totalTime}분</TotalTime>
+          <CountBox>
+            {/* <CountInput id="add-count-input" name="count" value={count} onChange={onChangeCount} />
+            <button onClick={() => countBtnHandler(item.id)}>입력</button>  */}
+            <p onClick={() => countHandler(item.id)}>{item.totalCount} 건</p>
+          </CountBox>
         </ListBox>
       ))}
     </Section>
@@ -93,6 +119,27 @@ const Main = () => {
 }
 
 export default Main
+
+const CountBox = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  p {
+    font-size: 15px;
+  }
+  button {
+    background-color: #369fb2;
+    color: white;
+    margin-left: 5px;
+    margin-right: 10px;
+    width: 40px;
+    cursor: pointer;
+  }
+`
+const CountInput = styled.input`
+  width: 40px;
+  font-size: 15px;
+`
 
 const Section = styled.section`
   margin: 20px;
@@ -118,7 +165,8 @@ const ListAddButton = styled.button`
 `
 
 const ListBox = styled.div`
-  width: 550px;
+  font-size: 15px;
+  width: 700px;
   display: flex;
   flex-direction: row;
   margin-bottom: 10px;
@@ -155,4 +203,6 @@ const Timer = styled.div`
 `
 const TotalTime = styled.div`
   font-size: 15px;
+  margin-right: 10px;
+  width: 70px;
 `
