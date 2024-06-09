@@ -78,6 +78,7 @@ const Main = () => {
       return
     }
     const userInput = prompt('건수를 입력하세요:', '')
+
     setCount(userInput)
     const updatedCount = list.map((item) => {
       if (item.id === itemId) {
@@ -85,13 +86,20 @@ const Main = () => {
       }
       return item
     })
-    window.location.reload()
-
-    // 수정된 리스트를 로컬 스토리지에 저장
     localStorage.setItem('List', JSON.stringify(updatedCount))
+
+    window.location.reload()
+  }
+  const resetBtnHandler = () => {
+    const reset = list.map((item) => {
+      return { ...item, totalTime: 0, totalCount: 0 }
+    })
+    localStorage.setItem('List', JSON.stringify(reset))
+    window.location.reload()
   }
   return (
     <Section>
+      <ResetBtn onClick={resetBtnHandler}>초기화</ResetBtn>
       <ListAddBox>
         <ListInput id="add-list-input" name="addList" value={addList} onChange={onChangeList}></ListInput>
         <ListAddButton onClick={ListAddBtnHandler}>추가</ListAddButton>
@@ -108,8 +116,6 @@ const Main = () => {
           <Timer>{inProgress.id === item.id ? timer : ''}</Timer>
           <TotalTime>총 {item.totalTime}분</TotalTime>
           <CountBox>
-            {/* <CountInput id="add-count-input" name="count" value={count} onChange={onChangeCount} />
-            <button onClick={() => countBtnHandler(item.id)}>입력</button>  */}
             <p onClick={() => countHandler(item.id)}>{item.totalCount} 건</p>
           </CountBox>
         </ListBox>
@@ -136,13 +142,19 @@ const CountBox = styled.div`
     cursor: pointer;
   }
 `
-const CountInput = styled.input`
-  width: 40px;
-  font-size: 15px;
-`
 
 const Section = styled.section`
   margin: 20px;
+  position: relative;
+`
+const ResetBtn = styled.button`
+  position: absolute;
+  right: 10px;
+
+  width: 70px;
+  height: 40px;
+  background-color: black;
+  color: white;
 `
 const ListAddBox = styled.div`
   margin-bottom: 20px;
